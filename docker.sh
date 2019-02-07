@@ -3,13 +3,13 @@
 set -eu
 
 if [[ "$EUID" = 0 ]]; then
-    printf '\n\e[1;34m%-6s\e[m\n' "(1) already root"
+    printf '\n\e[1;34m%-6s\e[m\n' "Check root: already root"
 else
     -k # make sure to ask for password on next sudo
     if true; then
-        printf '\n\e[1;92m%-6s\e[m\n' "(2) correct password"
+        printf '\n\e[1;92m%-6s\e[m\n' "Check root: correct password"
     else
-        printf '\n\e[1;31m%-6s\e[m\n'  "(3) wrong password"
+        printf '\n\e[1;31m%-6s\e[m\n'  "Check root: wrong password"
         exit 1
     fi
 fi
@@ -21,6 +21,7 @@ apt remove --yes docker docker-engine docker.io \
     && apt update \
     && apt --yes --no-install-recommends install \
         apt-transport-https \
+        add-apt-repository \
         ca-certificates \
     && wget --quiet --output-document=- https://download.docker.com/linux/${OS}/gpg \
         | apt-key add - \
@@ -42,10 +43,7 @@ apt install --yes jq curl \
     && VERSION=$(curl --silent https://api.github.com/repos/docker/compose/releases/latest | jq .name -r) \
     && printf '\n\e[1;92m%-6s\e[m\n' "Docker Compose install latest version ${VERSION}..." \
     && wget \
-        --output-document=/usr/local/bin/docker-compose \
+        --quiet --output-document=/usr/local/bin/docker-compose \
         https://github.com/docker/compose/releases/download/${VERSION}/run.sh \
     && chmod +x /usr/local/bin/docker-compose \
-    && wget \
-        --output-document=/etc/bash_completion.d/docker-compose \
-        "https://raw.githubusercontent.com/docker/compose/$(docker-compose version --short)/contrib/completion/bash/docker-compose" \
     && printf '\n\e[1;92m%-6s\e[m\n\n' "Docker Compose installed successfully"
