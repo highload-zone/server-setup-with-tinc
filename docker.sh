@@ -16,6 +16,55 @@ fi
 
 OS=$(. /etc/os-release; echo "$ID") && printf '\e[1;34m%-6s\e[m\n' "OS: ${OS}"
 
+# Tools
+apt-get -qq install mc htop curl git \
+    && printf '\e[1;92m%-6s\e[m\n' "Available tools: mc, htop, curl, git"
+
+
+# Swap
+grep -q "swapfile" /etc/fstab
+
+if [ $? -ne 0 ]; then
+    SWAP=$(free --giga | grep Mem | awk '{print $2}')
+    if [ $SWAP -gt 4 ]
+    then
+        SWAP=4
+    else
+        if [ "$SWAP" -eq "0" ]
+        then
+            SWAP=1
+        fi
+    fi
+	fallocate -l ${SWAP}G /swapfile \
+    && chmod 600 /swapfile \
+    && mkswap /swapfile \
+    && swapon /swapfile \
+    && echo '/swapfile none swap sw 0 0' >> /etc/fstab \
+    && swapon --show \
+    && printf '\e[1;34m%-6s\e[m\n' "Swap ${SWAP}G created"
+else
+	printf '\e[1;92m%-6s\e[m\n' "Swap exists"
+fi
+cat /proc/swaps
+cat /proc/meminfo | grep Swap
+
+# Kernel tuning
+grep -q "vm.swappiness=10" /etc/sysctl.d/99-sysctl.conf
+if [ $? -ne 0 ]; then
+    # sysctl
+    echo 'vm.swappiness=10' | tee -a /etc/sysctl.d/99-sysctl.conf
+    echo 'fs.file-max=500000' | tee -a /etc/sysctl.d/99-sysctl.conf
+    echo 'net.core.somaxconn = 65536' | tee -a /etc/sysctl.d/99-sysctl.conf
+    # security limits
+    echo '*         hard    nofile      32768' | tee -a /etc/security/limits.conf
+    echo '*         soft    nofile      32768' | tee -a /etc/security/limits.conf
+    echo 'root      hard    nofile      65536' | tee -a /etc/security/limits.conf
+    echo 'root      soft    nofile      65536' | tee -a /etc/security/limits.conf
+    sysctl -p && printf '\e[1;34m%-6s\e[m\n' "Sysctl configured"
+else
+	printf '\e[1;92m%-6s\e[m\n' "Sysctl configure exists"
+fi
+
 # Docker
 apt-get -qq remove --yes docker docker-engine docker.io \
     && apt-get -qq update \
