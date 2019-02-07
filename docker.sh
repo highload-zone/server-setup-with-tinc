@@ -24,7 +24,8 @@ apt-get -qq install mc htop curl git \
 # Swap
 grep -q "swapfile" /etc/fstab
 
-if [ $? -ne 0 ]; then
+if [ $? -ne 0 ]
+then
     SWAP=$(free --giga | grep Mem | awk '{print $2}')
     if [ $SWAP -gt 4 ]
     then
@@ -35,11 +36,11 @@ if [ $? -ne 0 ]; then
             SWAP=1
         fi
     fi
-	fallocate -l ${SWAP}G /swapfile \
+	fallocate -l "${SWAP}G" /swapfile \
     && chmod 600 /swapfile \
     && mkswap /swapfile \
     && swapon /swapfile \
-    && echo '/swapfile none swap sw 0 0' >> /etc/fstab \
+    && echo "/swapfile none swap sw 0 0" >> /etc/fstab \
     && swapon --show \
     && printf '\e[1;34m%-6s\e[m\n' "Swap ${SWAP}G created"
 else
