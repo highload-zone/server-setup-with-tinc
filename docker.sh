@@ -36,15 +36,15 @@ then
             SWAP=1
         fi
     fi
-	fallocate -l "${SWAP}G" /swapfile \
-    && chmod 600 /swapfile \
-    && mkswap /swapfile \
-    && swapon /swapfile \
-    && echo "/swapfile none swap sw 0 0" >> /etc/fstab \
-    && swapon --show \
-    && printf '\e[1;34m%-6s\e[m\n' "Swap ${SWAP}G created"
+    fallocate -l "${SWAP}G" /swapfile \
+        && chmod 600 /swapfile \
+        && mkswap /swapfile \
+        && swapon /swapfile \
+        && echo "/swapfile none swap sw 0 0" >> /etc/fstab \
+        && swapon --show \
+        && printf '\e[1;34m%-6s\e[m\n' "Swap ${SWAP}G created"
 else
-	printf '\e[1;92m%-6s\e[m\n' "Swap exists"
+    printf '\e[1;92m%-6s\e[m\n' "Swap exists"
 fi
 cat /proc/swaps
 cat /proc/meminfo | grep Swap
@@ -63,7 +63,7 @@ if [ $? -ne 0 ]; then
     echo 'root      soft    nofile      65536' | tee -a /etc/security/limits.conf
     sysctl -p && printf '\e[1;34m%-6s\e[m\n' "Sysctl configured"
 else
-	printf '\e[1;92m%-6s\e[m\n' "Sysctl configure exists"
+    printf '\e[1;92m%-6s\e[m\n' "Sysctl configure exists"
 fi
 
 # Docker
