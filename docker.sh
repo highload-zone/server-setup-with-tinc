@@ -2,7 +2,7 @@
 
 set -eu
 
-OS=$(. /etc/os-release; echo "$ID") && printf '\nOS: ${OS}\n'
+OS=$(. /etc/os-release; echo "$ID") && printf '\n\e[1;34m%-6s\e[m\n' "OS: ${OS}"
 
 # Docker
 sudo apt remove --yes docker docker-engine docker.io \
@@ -20,15 +20,15 @@ sudo apt remove --yes docker docker-engine docker.io \
     && sudo apt --yes --no-install-recommends install docker-ce \
     && sudo usermod --append --groups docker "$USER" \
     && sudo systemctl enable docker \
-    && printf '\nDocker installed successfully\n\n'
+    && printf '\n\e[1;92m%-6s\e[m\n\n' "Docker installed successfully"
 
-printf 'Waiting for Docker to start...\n\n'
+printf '\e[1;92m%-6s\e[m\n\n' "Waiting for Docker to start..."
 sleep 3
 
 # Docker Compose
 sudo apt install --yes jq curl \
     && VERSION=$(curl --silent https://api.github.com/repos/docker/compose/releases/latest | jq .name -r) \
-    && printf '\nDocker Compose install latest version ${VERSION}...\n' \
+    && printf '\n\e[1;92m%-6s\e[m\n' "Docker Compose install latest version ${VERSION}..." \
     && sudo wget \
         --output-document=/usr/local/bin/docker-compose \
         https://github.com/docker/compose/releases/download/${VERSION}/run.sh \
@@ -36,4 +36,4 @@ sudo apt install --yes jq curl \
     && sudo wget \
         --output-document=/etc/bash_completion.d/docker-compose \
         "https://raw.githubusercontent.com/docker/compose/$(docker-compose version --short)/contrib/completion/bash/docker-compose" \
-    && printf '\nDocker Compose installed successfully\n\n'
+    && printf '\n\e[1;92m%-6s\e[m\n\n' "Docker Compose installed successfully"
