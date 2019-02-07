@@ -2,16 +2,18 @@
 
 set -eu
 
+OS=$(. /etc/os-release; echo "$ID") && printf '\nOS: ${OS}\n'
+
 # Docker
 sudo apt remove --yes docker docker-engine docker.io \
     && sudo apt update \
     && sudo apt --yes --no-install-recommends install \
         apt-transport-https \
         ca-certificates \
-    && wget --quiet --output-document=- https://download.docker.com/linux/ubuntu/gpg \
+    && wget --quiet --output-document=- https://download.docker.com/linux/${OS}/gpg \
         | sudo apt-key add - \
     && sudo add-apt-repository \
-        "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/ubuntu \
+        "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/${OS} \
         $(lsb_release --codename --short) \
         stable" \
     && sudo apt update \
@@ -24,9 +26,10 @@ printf 'Waiting for Docker to start...\n\n'
 sleep 3
 
 # Docker Compose
-sudo apt install --yes jq curl
-VERSION=$(curl --silent https://api.github.com/repos/docker/compose/releases/latest | jq .name -r)
-sudo wget \
+sudo apt install --yes jq curl \
+    && VERSION=$(curl --silent https://api.github.com/repos/docker/compose/releases/latest | jq .name -r) \
+    && printf '\nDocker Compose install latest version ${VERSION}...\n' \
+    && sudo wget \
         --output-document=/usr/local/bin/docker-compose \
         https://github.com/docker/compose/releases/download/${VERSION}/run.sh \
     && sudo chmod +x /usr/local/bin/docker-compose \
