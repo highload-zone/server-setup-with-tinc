@@ -1,6 +1,4 @@
-#!/usr/bin/env sh
-
-set -eu
+#!/usr/bin/env bash
 
 if [[ "$EUID" = 0 ]]; then
     printf '\e[1;34m%-6s\e[m\n' "Check root: already root"
@@ -24,25 +22,24 @@ apt-get -qq install mc htop curl git \
 # Swap
 grep -q "swapfile" /etc/fstab
 
-if [ $? -ne 0 ]
-then
-    SWAP=$(free --giga | grep Mem | awk '{print $2}')
-    if [ $SWAP -gt 4 ]
+if [ $? -ne 0 ]; then
+    swapsize=$(free --giga | grep Mem | awk '{print $2}')
+    if [ $swapsize -gt 4 ]
     then
-        SWAP=4
+        swapsize=4
     else
-        if [ "$SWAP" -eq "0" ]
+        if [ $swapsize -eq 0 ]
         then
-            SWAP=1
+            swapsize=1
         fi
     fi
-    fallocate -l "${SWAP}G" /swapfile \
-        && chmod 600 /swapfile \
-        && mkswap /swapfile \
-        && swapon /swapfile \
-        && echo "/swapfile none swap sw 0 0" >> /etc/fstab \
-        && swapon --show \
-        && printf '\e[1;34m%-6s\e[m\n' "Swap ${SWAP}G created"
+    echo 'swapfile not found. Adding swapfile.' \
+    && fallocate -l ${swapsize}G /swapfile \
+    && chmod 600 /swapfile \
+    && mkswap /swapfile \
+    && swapon /swapfile \
+    && echo '/swapfile none swap defaults 0 0' >> /etc/fstab \
+    && printf '\e[1;34m%-6s\e[m\n' "Swap ${swapsize}G created"
 else
     printf '\e[1;92m%-6s\e[m\n' "Swap exists"
 fi
@@ -86,7 +83,7 @@ apt-get -qq remove --yes docker docker-engine docker.io \
     && systemctl enable docker \
     && printf '\n\e[1;92m%-6s\e[m\n\n' "Docker installed successfully"
 
-printf '\e[1;92m%-6s\e[m\n\n' "Waiting for Docker to start..."
+printf '\e[1;92m%-6s\e[m\n' "Waiting for Docker to start..."
 sleep 3
 
 # Docker Compose
