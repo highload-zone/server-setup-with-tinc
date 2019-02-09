@@ -15,8 +15,8 @@ fi
 OS=$(. /etc/os-release; echo "$ID") && printf '\e[1;34m%-6s\e[m\n' "OS: ${OS}"
 
 # Tools
-apt-get -qq install mc htop curl git \
-    && printf '\e[1;92m%-6s\e[m\n' "Available tools: mc, htop, curl, git"
+apt-get -qq install mc htop curl git net-tools \
+    && printf '\e[1;92m%-6s\e[m\n' "Available tools: mc, htop, curl, git, net-tools"
 
 
 # Swap
