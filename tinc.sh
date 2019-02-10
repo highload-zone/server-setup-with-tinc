@@ -29,9 +29,21 @@ tinc() {
         && printf '\e[1;92m%-6s\e[m\n' "tinc $@"
 }
 
+checkGIT() {
+    if [[ -z "${GIT}" ]]; then
+        printf '\e[1;31m%-6s\e[m\n' "Environment variable GIT is not defined"
+        read -e -p "Enter GIT url (https://user:secret@github.com/user/repo.git):" GIT
+        checkGIT
+    fi
+}
+
  ### check if network exists
 if [ ! -f ${TINC_HOME}/${NETWORK}/tinc.conf ]; then
     printf '\e[1;92m%-6s\e[m\n' "No Tinc Network Detected.. Installing.."
+
+    checkGIT
+    printf '\e[1;34m%-6s\e[m\n' "GIT: ${GIT}"
+
     mkdir -p ${TINC_HOME}/${NETWORK}/
     git clone ${GIT} ${TINC_HOME}/${NETWORK}/hosts
 
@@ -48,9 +60,6 @@ if [ ! -f ${TINC_HOME}/${NETWORK}/tinc.conf ]; then
     echo "Address = "${PUBLIC_IP} >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
     echo "Subnet = "${PRIVATE_IP}"/32" >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
     echo "Compression = "${COMPRESSION} >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
-    #echo "Cipher = id-aes256-GCM" >> $TINC_HOME/$NETWORK/hosts/$NODE_NAME
-    #echo "Digest = whirlpool" >> $TINC_HOME/$NETWORK/hosts/$NODE_NAME
-    #echo "MACLength = 16" >> $TINC_HOME/$NETWORK/hosts/$NODE_NAME
 
     cd ${TINC_HOME}/${NETWORK}/hosts
     git config --global user.email ${NODE_NAME}"@docker"
@@ -59,6 +68,9 @@ if [ ! -f ${TINC_HOME}/${NETWORK}/tinc.conf ]; then
     git add .
     git commit -m "${NODE_NAME} ${PRIVATE_IP}"
     git push
+
+    # Crontab
+    crontab -l | { cat; printf '%-6s\n' "* * * * * cd ${TINC_HOME}/${NETWORK}/hosts;git pull"; } | crontab -
 fi
 
 # Tweak the config to add our particular setup

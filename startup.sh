@@ -7,7 +7,7 @@ else
     if true; then
         printf '\e[1;92m%-6s\e[m\n' "Check root: correct password"
     else
-        printf '\e[1;31m%-6s\e[m\n'  "Check root: wrong password"
+        printf '\e[1;31m%-6s\e[m\n' "Check root: wrong password"
         exit 1
     fi
 fi
@@ -17,8 +17,25 @@ OS=$(. /etc/os-release; echo "$ID") && printf '\e[1;34m%-6s\e[m\n' "OS: ${OS}"
 # Tools
 apt-get -qq update \
     && apt-get -qq install -f \
-    && apt-get -qq install mc htop curl git net-tools \
-    && printf '\e[1;92m%-6s\e[m\n' "Available tools: mc, htop, curl, git, net-tools"
+    && apt-get -qq install mc htop curl git net-tools apache-utils \
+    && printf '\e[1;92m%-6s\e[m\n' "Available tools: mc, htop, curl, git, net-tools, apache-util"
+
+# Kernel tuning
+grep -q "vm.swappiness=10" /etc/sysctl.d/99-sysctl.conf
+if [ $? -ne 0 ]; then
+    # sysctl
+    echo 'vm.swappiness=10' | tee -a /etc/sysctl.d/99-sysctl.conf
+    echo 'fs.file-max=500000' | tee -a /etc/sysctl.d/99-sysctl.conf
+    echo 'net.core.somaxconn = 65536' | tee -a /etc/sysctl.d/99-sysctl.conf
+    # security limits
+    echo '*         hard    nofile      32768' | tee -a /etc/security/limits.conf
+    echo '*         soft    nofile      32768' | tee -a /etc/security/limits.conf
+    echo 'root      hard    nofile      65536' | tee -a /etc/security/limits.conf
+    echo 'root      soft    nofile      65536' | tee -a /etc/security/limits.conf
+    sysctl -p && printf '\e[1;34m%-6s\e[m\n' "Sysctl configured"
+else
+    printf '\e[1;92m%-6s\e[m\n' "Sysctl configure exists"
+fi
 
 # Swap
 grep -q "swapfile" /etc/fstab
@@ -46,23 +63,6 @@ else
 fi
 cat /proc/swaps
 cat /proc/meminfo | grep Swap
-
-# Kernel tuning
-grep -q "vm.swappiness=10" /etc/sysctl.d/99-sysctl.conf
-if [ $? -ne 0 ]; then
-    # sysctl
-    echo 'vm.swappiness=10' | tee -a /etc/sysctl.d/99-sysctl.conf
-    echo 'fs.file-max=500000' | tee -a /etc/sysctl.d/99-sysctl.conf
-    echo 'net.core.somaxconn = 65536' | tee -a /etc/sysctl.d/99-sysctl.conf
-    # security limits
-    echo '*         hard    nofile      32768' | tee -a /etc/security/limits.conf
-    echo '*         soft    nofile      32768' | tee -a /etc/security/limits.conf
-    echo 'root      hard    nofile      65536' | tee -a /etc/security/limits.conf
-    echo 'root      soft    nofile      65536' | tee -a /etc/security/limits.conf
-    sysctl -p && printf '\e[1;34m%-6s\e[m\n' "Sysctl configured"
-else
-    printf '\e[1;92m%-6s\e[m\n' "Sysctl configure exists"
-fi
 
 # Docker
 apt-get -qq remove --yes docker docker-engine docker.io \
@@ -96,3 +96,17 @@ apt-get -qq install --yes jq curl \
         https://github.com/docker/compose/releases/download/${VERSION}/run.sh \
     && chmod +x /usr/local/bin/docker-compose \
     && printf '\n\e[1;92m%-6s\e[m\n\n' "Docker Compose installed successfully"
+
+
+installTINC() {
+    wget -qO - https://raw.githubusercontent.com/intech/devops/master/tinc.sh | bash
+}
+
+while true; do
+    read -p "Do you wish to install tinc vpn?" yn
+    case $yn in
+        [Yy]* ) installTINC; break;;
+        [Nn]* ) exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
