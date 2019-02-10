@@ -22,7 +22,7 @@ apt-get -qq update \
 
 # Kernel tuning
 grep -q "vm.swappiness=10" /etc/sysctl.d/99-sysctl.conf
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
     # sysctl
     echo 'vm.swappiness=10' | tee -a /etc/sysctl.d/99-sysctl.conf
     echo 'fs.file-max=500000' | tee -a /etc/sysctl.d/99-sysctl.conf
@@ -40,13 +40,13 @@ fi
 # Swap
 grep -q "swapfile" /etc/fstab
 
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
     swapsize=$(free --giga | grep Mem | awk '{print $2}')
-    if [ $swapsize -gt 4 ]
+    if [[ $swapsize -gt 4 ]]
     then
         swapsize=4
     else
-        if [ $swapsize -eq 0 ]
+        if [[ $swapsize -eq 0 ]]
         then
             swapsize=1
         fi
@@ -102,11 +102,16 @@ installTINC() {
     wget -qO - https://raw.githubusercontent.com/intech/devops/master/tinc.sh | bash
 }
 
-while true; do
-    read -p "Do you wish to install tinc vpn?" yn
-    case $yn in
-        [Yy]* ) installTINC; break;;
-        [Nn]* ) exit;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
+if [[ -z "${TINC}" ]]
+then
+    if [[ "${TINC}" == "Y" ]]; then installTINC; fi
+else
+    while true; do
+        read -p "Do you wish to install tinc vpn?" yn
+        case $yn in
+            [Yy]* ) installTINC; break;;
+            [Nn]* ) exit;;
+            * ) echo "Please answer yes or no.";;
+        esac
+    done
+fi

@@ -38,7 +38,7 @@ checkGIT() {
 }
 
  ### check if network exists
-if [ ! -f ${TINC_HOME}/${NETWORK}/tinc.conf ]; then
+if [[ ! -f ${TINC_HOME}/${NETWORK}/tinc.conf ]]; then
     printf '\e[1;92m%-6s\e[m\n' "No Tinc Network Detected.. Installing.."
 
     checkGIT
@@ -47,7 +47,7 @@ if [ ! -f ${TINC_HOME}/${NETWORK}/tinc.conf ]; then
     mkdir -p ${TINC_HOME}/${NETWORK}/
     git clone ${GIT} ${TINC_HOME}/${NETWORK}/hosts
 
-    if [ -f ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME} ]; then
+    if [[ -f ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME} ]]; then
         rm -rf ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
     fi
 
