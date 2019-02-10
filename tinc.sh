@@ -26,7 +26,7 @@ nextip() {
 
 tinc() {
     docker run --rm --net=host --device=/dev/net/tun --cap-add NET_ADMIN --volume ${TINC_HOME}:/etc/tinc jenserat/tinc -n ${NETWORK} "$@" \
-        && printf '\e[1;92m%-6s\e[m\n' "tinc $@"
+        && echo "tinc $@"
 }
 
 checkGIT() {
