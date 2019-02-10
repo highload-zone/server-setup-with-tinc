@@ -15,9 +15,10 @@ fi
 OS=$(. /etc/os-release; echo "$ID") && printf '\e[1;34m%-6s\e[m\n' "OS: ${OS}"
 
 # Tools
-apt-get -qq install mc htop curl git net-tools \
+apt-get -qq update \
+    && apt-get -qq install -f \
+    && apt-get -qq install mc htop curl git net-tools \
     && printf '\e[1;92m%-6s\e[m\n' "Available tools: mc, htop, curl, git, net-tools"
-
 
 # Swap
 grep -q "swapfile" /etc/fstab

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Env GIT='https://login:pass@github.com/user/repo.git'
+# Env GIT='https://login:secret@github.com/user/repo.git'
 
 # Default
 NETWORK='vpn'
