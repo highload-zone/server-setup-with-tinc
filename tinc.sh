@@ -13,6 +13,10 @@ PUBLIC_IP=$(curl -s http://api.ipify.org)
 TINC_HOME=$(pwd -P)/tinc
 NODE_NAME=$(hostname -s | sed -r 's/[^a-zA-Z0-9]+/_/g')
 
+printf '\e[1;34m%-6s\e[m\n' "Tinc path: ${TINC_HOME}"
+printf '\e[1;34m%-6s\e[m\n' "Node name: ${NODE_NAME}"
+printf '\e[1;34m%-6s\e[m\n' "Public IP: ${PUBLIC_IP}"
+
 nextip() {
     IP_HEX=$(printf '%.2X%.2X%.2X%.2X\n' `echo ${PRIVATE_IP} | sed -e 's/\./ /g'`)
     NEXT_IP_HEX=$(printf %.8X `echo $(( 0x$IP_HEX + $1 ))`)
@@ -21,12 +25,13 @@ nextip() {
 }
 
 tinc() {
-    docker run --rm --net=host --device=/dev/net/tun --cap-add NET_ADMIN --volume ${TINC_HOME}:/etc/tinc jenserat/tinc -n ${NETWORK} "$@"
+    docker run --rm --net=host --device=/dev/net/tun --cap-add NET_ADMIN --volume ${TINC_HOME}:/etc/tinc jenserat/tinc -n ${NETWORK} "$@" \
+        && printf '\e[1;92m%-6s\e[m\n' "tinc $@"
 }
 
  ### check if network exists
 if [ ! -f ${TINC_HOME}/${NETWORK}/tinc.conf ]; then
-    echo 'No Tinc Network Detected.. Installing..'
+    printf '\e[1;92m%-6s\e[m\n' "No Tinc Network Detected.. Installing.."
     mkdir -p ${TINC_HOME}/${NETWORK}/
     git clone ${GIT} ${TINC_HOME}/${NETWORK}/hosts
 
@@ -39,6 +44,7 @@ if [ ! -f ${TINC_HOME}/${NETWORK}/tinc.conf ]; then
     # Declare public and private IPs in the host file, CONFIG/NET/hosts/HOST
     COUNT=$(ls -la ${TINC_HOME}/${NETWORK}/hosts/ | wc -l)
     PRIVATE_IP=$(nextip $COUNT+1)
+    printf '\e[1;34m%-6s\e[m\n' "Private IP: ${PRIVATE_IP}"
     echo "Address = "${PUBLIC_IP} >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
     echo "Subnet = "${PRIVATE_IP}"/32" >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
     echo "Compression = "${COMPRESSION} >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
@@ -84,11 +90,12 @@ chmod +x ${TINC_HOME}/${NETWORK}/tinc-down
 
 # Run
 docker run -d --restart=always --name=tinc --net=host --device=/dev/net/tun --cap-add NET_ADMIN --volume ${TINC_HOME}:/etc/tinc jenserat/tinc -n ${NETWORK} start -D \
-    && echo "Docker container started with name: tinc"
+    && printf '\e[1;92m%-6s\e[m\n' "Docker container started with name: tinc"
 
 # Test connection
+printf '\e[1;34m%-6s\e[m\n' "----------------------------------------------------------------------------------------------------"
 netstat -ntlpv | grep 655
 ifconfig tun0
 docker exec tinc tinc -n ${NETWORK} info ${NODE_NAME}
-echo "----------------------------------------------------------------------------------------------------"
+printf '\e[1;34m%-6s\e[m\n' "----------------------------------------------------------------------------------------------------"
 docker exec tinc tinc -n ${NETWORK} dump nodes

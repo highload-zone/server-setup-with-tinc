@@ -34,7 +34,7 @@ if [ $? -ne 0 ]; then
             swapsize=1
         fi
     fi
-    echo 'swapfile not found. Adding swapfile.' \
+    printf '\e[1;34m%-6s\e[m\n' "swapfile not found. Adding swapfile." \
     && fallocate -l ${swapsize}G /swapfile \
     && chmod 600 /swapfile \
     && mkswap /swapfile \
