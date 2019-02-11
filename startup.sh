@@ -17,8 +17,8 @@ OS=$(. /etc/os-release; echo "$ID") && printf '\e[1;34m%-6s\e[m\n' "OS: ${OS}"
 # Tools
 apt-get -qq update \
     && apt-get -qq install -f \
-    && apt-get -qq install mc htop curl git net-tools apache-utils \
-    && printf '\e[1;92m%-6s\e[m\n' "Available tools: mc, htop, curl, git, net-tools, apache-util"
+    && apt-get -qq -y install mc htop curl git net-tools \
+    && printf '\e[1;92m%-6s\e[m\n' "Available tools: mc, htop, curl, git, net-tools"
 
 # Kernel tuning
 grep -q "vm.swappiness=10" /etc/sysctl.d/99-sysctl.conf
