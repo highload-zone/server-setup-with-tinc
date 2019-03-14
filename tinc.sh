@@ -32,8 +32,7 @@ tinc() {
 checkGIT() {
     if [[ -z "${GIT}" ]]; then
         printf '\e[1;31m%-6s\e[m\n' "Environment variable GIT is not defined"
-        read -e -p "Enter GIT url (https://user:secret@github.com/user/repo.git):" GIT
-        checkGIT
+        exit 1
     fi
 }
 
@@ -70,7 +69,7 @@ if [[ ! -f ${TINC_HOME}/${NETWORK}/tinc.conf ]]; then
     git push
 
     # Crontab
-    crontab -l | { cat; printf '%-6s\n' "* * * * * cd ${TINC_HOME}/${NETWORK}/hosts;git pull"; } | crontab -
+    crontab -l | { cat; printf '%-6s\n' "* * * * * git -C ${TINC_HOME}/${NETWORK}/hosts pull >/dev/null 2>&1"; } | crontab -
 fi
 
 # Tweak the config to add our particular setup
