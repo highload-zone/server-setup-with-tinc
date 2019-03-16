@@ -53,16 +53,17 @@ if [[ ! -f ${TINC_HOME}/${NETWORK}/tinc.conf ]]; then
     tinc init ${NODE_NAME}
 
     # Declare public and private IPs in the host file, CONFIG/NET/hosts/HOST
-    COUNT=$(ls -la ${TINC_HOME}/${NETWORK}/hosts/ | wc -l)
-    PRIVATE_IP=$(nextip $COUNT+1)
+    COUNT=$(ls -l ${TINC_HOME}/${NETWORK}/hosts/ | wc -l)
+    PRIVATE_IP=$(nextip $COUNT)
     printf '\e[1;34m%-6s\e[m\n' "Private IP: ${PRIVATE_IP}"
     echo "Address = "${PUBLIC_IP} >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
     echo "Subnet = "${PRIVATE_IP}"/32" >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
     echo "Compression = "${COMPRESSION} >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
 
     cd ${TINC_HOME}/${NETWORK}/hosts
-    git config --global user.email ${NODE_NAME}"@docker"
-    git config --global user.name ${NODE_NAME}
+    git config user.email ${NODE_NAME}"@docker"
+    git config user.name ${NODE_NAME}
+    git config commit.gpgsign false
 
     git add .
     git commit -m "${NODE_NAME} ${PRIVATE_IP}"

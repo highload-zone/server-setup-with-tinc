@@ -11,7 +11,6 @@ wget -qO - https://raw.githubusercontent.com/intech/devops/master/startup.sh | b
 - curl
 - git
 - net-tools
-- apache-utils
 
 ### Create SWAP by calculate available RAM
 
