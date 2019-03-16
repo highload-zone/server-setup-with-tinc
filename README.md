@@ -28,7 +28,16 @@ Get and install latest version
 
 ### Install tinc vpn
 
-## Manual install and run only tinc vpn in docker
+## Install and run tinc vpn in docker
 ```bash
 wget -qO - https://raw.githubusercontent.com/intech/devops/master/tinc.sh | GIT='https://login:secret@github.com/user/repo.git' bash
 ```
+
+#### Environment variables
+| Env         | Default  | Required |
+|-------------|----------|----------|
+| GIT         |          |   [x]    |
+| NETWORK     | vpn      |   [ ]    |
+| INTERFACE   | tun0     |   [ ]    |
+| PRIVATE_IP  | 10.0.0.0 |   [ ]    |
+| COMPRESSION | 0        |   [ ]    |
