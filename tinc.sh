@@ -57,7 +57,7 @@ if [[ ! -f ${TINC_HOME}/${NETWORK}/tinc.conf ]]; then
     PRIVATE_IP=$(nextip ${COUNT})
     printf '\e[1;34m%-6s\e[m\n' "Private IP: ${PRIVATE_IP}"
     echo "Address = "${PUBLIC_IP} >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
-    echo "Subnet = "${PRIVATE_IP}"/8" >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
+    echo "Subnet = "${PRIVATE_IP}"/32" >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
     echo "Compression = "${COMPRESSION} >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
 
     cd ${TINC_HOME}/${NETWORK}/hosts
