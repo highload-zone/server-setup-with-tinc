@@ -19,7 +19,7 @@ printf '\e[1;34m%-6s\e[m\n' "Public IP: ${PUBLIC_IP}"
 
 nextip() {
     IP_HEX=$(printf '%.2X%.2X%.2X%.2X\n' `echo ${PRIVATE_IP} | sed -e 's/\./ /g'`)
-    NEXT_IP_HEX=$(printf %.8X `echo $(( 0x$IP_HEX + $1 ))`)
+    NEXT_IP_HEX=$(printf %.8X `echo $(( 0x$IP_HEX + $1 * 256 ))`)
     NEXT_IP=$(printf '%d.%d.%d.%d\n' `echo ${NEXT_IP_HEX} | sed -r 's/(..)/0x\1 /g'`)
     echo "$NEXT_IP"
 }
@@ -57,7 +57,7 @@ if [[ ! -f ${TINC_HOME}/${NETWORK}/tinc.conf ]]; then
     PRIVATE_IP=$(nextip ${COUNT})
     printf '\e[1;34m%-6s\e[m\n' "Private IP: ${PRIVATE_IP}"
     echo "Address = "${PUBLIC_IP} >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
-    echo "Subnet = "${PRIVATE_IP}"/32" >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
+    echo "Subnet = "${PRIVATE_IP}"/8" >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
     echo "Compression = "${COMPRESSION} >> ${TINC_HOME}/${NETWORK}/hosts/${NODE_NAME}
 
     cd ${TINC_HOME}/${NETWORK}/hosts
@@ -89,7 +89,7 @@ done
 # Edit the tinc-up script
 cat << EOF > ${TINC_HOME}/${NETWORK}/tinc-up
 #!/bin/sh
-ifconfig \$INTERFACE ${PRIVATE_IP} netmask 255.255.255.0
+ifconfig \$INTERFACE ${PRIVATE_IP} netmask 255.0.0.0
 EOF
 
 cat << EOF > ${TINC_HOME}/${NETWORK}/tinc-down

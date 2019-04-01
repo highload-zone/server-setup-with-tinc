@@ -41,3 +41,10 @@ wget -qO - https://raw.githubusercontent.com/intech/devops/master/tinc.sh | GIT=
 | INTERFACE   | tun0     | :white_large_square:    |
 | PRIVATE_IP  | 10.0.0.0 | :white_large_square:    |
 | COMPRESSION | 0        | :white_large_square:    |
+
+### Routing policy
+| Mask           | Description  |
+|----------------|--------------|
+| 255.0.0.0      | Datacenter   |
+| 255.255.0.0    | Server       |
+| 255.255.255.0  | Container    |
