@@ -104,14 +104,14 @@ installTINC() {
 
 if [[ -z "${TINC}" ]]
 then
-    while true; do
+    #while true; do
         read -p "Do you wish to install tinc vpn?" yn
         case $yn in
-            [Yy]* ) installTINC; break;;
+            [Yy]* ) installTINC;;
             [Nn]* ) exit;;
             * ) echo "Please answer yes or no.";;
         esac
-    done
+    #done
 else
     if [[ "${TINC}" == "Y" ]]; then installTINC; fi
 fi
